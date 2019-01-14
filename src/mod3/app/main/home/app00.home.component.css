@@ -1,0 +1,188 @@
+.centered {
+	text-align: center;
+}
+.left {
+	text-align: left;
+}
+.separator {
+	margin-top: 50px;
+	margin-bottom: 50px;
+}
+
+.top-space {
+	margin-top: 20px;
+}
+
+.cursor-select {
+	cursor: pointer;
+}
+
+.bottom-space {
+	margin-bottom: 120px;
+}
+
+.download-img {
+	max-height: 50px;
+	margin-right: 20px;
+}
+
+.config-img {
+	position: relative;
+	bottom: 2px;
+	max-width: 30px;
+	margin-left: 10px;
+	user-select: none;
+	cursor: pointer;
+}
+
+.select-img {
+	position: relative;
+	top: 4px;
+	max-width: 28px;
+	margin-left: 12px;
+	user-select: none;
+	cursor: pointer;
+}
+
+.download-separator {
+	margin-left: 100px;
+}
+
+.w10-img, .linux-img {
+	transition: all .2s ease-in-out;
+	user-select: none;
+	cursor: pointer;
+}
+
+.w10-img {	
+	margin-right: 10px;
+	max-width: 127px;
+}
+
+.linux-img {
+	max-height: 70px;
+}
+
+.w10-img:hover, .linux-img:hover {
+	transform: scale(1.1);
+}
+
+@media screen and (max-width: 300px) {
+	.w10-img {
+		margin-right: 0px;
+	}
+}
+
+.service-title {
+	display: inline-block;
+	margin-top: 0px;
+}
+
+@media screen and (max-width: 500px) {
+  .service-title {
+	  margin-top: 60px; 
+  }
+}
+
+.logout-button {
+	position: absolute;
+	left: 20px;
+}
+
+.shop-button {
+	position: absolute;
+	right: 20px;
+}
+
+.title{
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+
+.input-text {
+	margin-left: 12px;
+}
+
+.custom-label-socket {
+	width: 84px;
+	text-align: right;
+}
+
+@media screen and (max-width: 331px) {
+	.custom-label-socket {
+		text-align: center;
+	}
+}
+
+.custom-label-tipo {
+	position: relative;
+	right: 112px;
+}
+
+@media screen and (max-width: 446px) {
+	.custom-label-tipo {
+		position: none;
+		right: 0px;
+	}
+}
+
+.custom-select {
+	max-width: 350px;
+	margin-top: 10px;
+}
+
+.select-edit {
+	display: inline-block;
+	max-width: 250px;
+	margin-top: 10px;
+}
+
+.notification-gif {
+	max-width: 30px;
+	margin-left: 15px;
+	user-select: none;
+}
+
+.input-edit {
+	margin-left: 32%;
+}
+
+@media screen and (max-width: 385px) {
+	.input-edit {
+		margin-left: 0px;
+	}
+}
+
+.custom-property {
+	margin-left: 32%;
+}
+
+@media screen and (max-width: 768px) {
+	.custom-property {
+		margin-left: 0%;
+	}
+	.left {
+		text-align: center;
+	}
+	.input-edit {
+		margin-left: 12px;
+	}
+}
+
+.custom-dropdown-item {
+	display: block;
+	width: 100%;
+	padding: 0.25rem 1.5rem;
+	clear: both;
+	font-weight: 400;
+	color: #212529;
+	text-align: inherit;
+	white-space: nowrap;
+	background-color: transparent;
+	border: 0;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+	color: #212529;
+}
+

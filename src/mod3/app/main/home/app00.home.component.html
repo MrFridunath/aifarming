@@ -1,0 +1,174 @@
+<div class="container top-space centered">
+	<div *ngIf="!showNotification" class="separator">
+		<span>AÑADIR CULTIVO AUTÓNOMO</span>
+		<img class="config-img" src="assets/app00/home/add.png" (click)="toggleConfiguration()" (mouseenter)="configZoom()" (mouseleave)="configZoom()" [@newSystemConfigurationImageAnimation]="newSystemConfigurationImageState">
+	</div>
+	<div *ngIf="showNewSystemConfiguration" class="bottom-space">
+		<form [formGroup]="systemForm" (ngSubmit)="addSystem()">
+			<div class="title">INTRODUZCA LAS PROPIEDADES DEL <i>SOCKET</i> TCP DEL <i>MIDDLEWARE</i></div>
+			<div class="row">
+				<div class="col-md-6">
+					<label class="custom-label-socket">IP:</label>
+					<input class="input-text" type="text" formControlName="ip">
+				</div>
+				<div class="col-md-6">
+					<label class="custom-label-socket">Puerto:</label>
+					<input class="input-text" type="text" formControlName="port">
+				</div>
+			</div>
+			<div class="row top-space">
+				<div class="col-md-6">
+					<label class="custom-label-socket">Usuario:</label>
+					<input class="input-text" type="text" formControlName="username">
+				</div>
+				<div class="col-md-6">
+					<label class="custom-label-socket">Contraseña:</label>
+					<input class="input-text" type="password" formControlName="password">
+				</div>
+			</div>
+			<div class="title">SELECCIONE LAS CARACTERÍSTICAS DEL CULTIVO</div>
+			<label>Añada un nombre al cultivo:</label>
+			<input class="input-text" type="text" formControlName="name">
+			<div class="custom-label-tipo top-space">Seleccione el tipo de cultivo:</div>
+			<select class="form-control custom-select">
+				<option *ngFor="let harvest of myHarvests">{{harvest.name}}</option>
+			</select>
+			<img class="select-img" src="assets/app00/home/add.png" (mouseenter)="configZoom()" (mouseleave)="configZoom()" [@newSystemConfigurationImageAnimation]="newSystemConfigurationImageState">
+			<div class="top-space">
+				<button class="btn btn-success" type="submit">ACEPTAR</button>
+			</div>
+		</form>
+	</div>
+	<div *ngIf="showNotification">
+		<div *ngIf="notificationId === 0" class="title">
+			<span>CONECTANDO CON EL <i>MIDDLEWARE</i>...</span>
+			<img class="notification-gif" src="assets/app00/home/loading.gif">
+		</div>
+		<div *ngIf="notificationId === 404" class="title">
+			<div>NO SE ENCONTRÓ EL <i>MIDDLEWARE</i> EN LA IP Y PUERTO INTRODUCIDOS</div>
+			<button class="btn btn-warning top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>
+		<div *ngIf="notificationId === 401" class="title">
+			<div>LOS CREDENCIALES DEL <i>MIDDLEWARE</i> INTRODUCIDOS NO SON CORRECTOS</div>
+			<button class="btn btn-warning top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>
+		<div *ngIf="notificationId === 408" class="title">
+			<div>EL MÓDULO DE CULTIVO TARDA DEMASIADO EN RESPONDER</div>
+			<button class="btn btn-info top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>
+		<div *ngIf="notificationId === 409.1" class="title">
+			<div>NO SE PUEDEN REGISTRAR MAS MÓDULOS DE CULTIVO EN ESTE <i>MIDDLEWARE</i></div>
+			<button class="btn btn-info top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>
+		<div *ngIf="notificationId === 409.2" class="title">
+			<div>NO EXISTEN MÓDULOS DE CULTIVO REGISTRADOS POR EL <i>MIDDLEWARE</i></div>
+			<button class="btn btn-info top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>
+		<div *ngIf="notificationId === 410.1" class="title">
+			<div>NO SE ENCONTRÓ NINGÚN MÓDULO DE CULTIVO SIN REGISTRAR CONECTADO AL <i>MIDDLEWARE</i></div>
+			<button class="btn btn-info top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>
+		<div *ngIf="notificationId === 410.2" class="title">
+			<div>EL MÓDULO DE CULTIVO INDICADO NO ESTÁ CONECTADO AL <i>MIDDLEWARE</i></div>
+			<button class="btn btn-warning top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>
+		<div *ngIf="notificationId === 500" class="title">
+			<div>SE PRODUJO UN ERROR EN EL MÓDULO DE CULTIVO</div>
+			<button class="btn btn-warning top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>
+		<div *ngIf="notificationId === 200.1" class="title">
+			<div>EL MÓDULO DE CULTIVO SE HA REGISTRADO CORRECTAMENTE</div>
+			<button class="btn btn-success top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>
+		<div *ngIf="notificationId === 200.2" class="title">
+			<div>EL MÓDULO DE CULTIVO SE HA ELIMINADO CORRECTAMENTE</div>
+			<button class="btn btn-success top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>		
+		<div *ngIf="notificationId === 200.3" class="title">
+			<div>LA ACCIÓN SE ENVIÓ CORRECTAMENTE</div>
+			<button class="btn btn-success top-space" (click)="showNotification = false">ACEPTAR</button>
+		</div>
+	</div>
+	<div *ngIf="!showNotification">
+		<div *ngIf="mySystems.length > 0" class="title">CULTIVOS MONITORIZADOS</div>
+		<div *ngFor="let system of mySystems; let i = index;" class="bottom-space">
+			<div>CULTIVO {{i+1}}</div>
+			<div class="row">
+				<div class="col-md-6 top-space left">
+					<span *ngIf="!showModificationSystemSetting[i]" class="custom-property">Nombre del cultivo: {{system.name}}</span>
+					<div *ngIf="showModificationSystemSetting[i] centered">
+						<label class="custom-property">Nombre del cultivo:</label>
+						<input class="input-edit" type="text" [(ngModel)]="system.name" (ngModelChange)="editSystem(i)">
+					</div>
+				</div>
+				<div class="col-md-6 top-space left">
+					<span *ngIf="!showModificationSystemSetting[i]" class="custom-property">Tipo de cultivo: {{system.type}}</span>
+					<div *ngIf="showModificationSystemSetting[i]">
+						<div class="custom-property">Tipo de cultivo:</div>
+						<select class="form-control select-edit custom-property" [(ngModel)]="sytem.harvest.name" (ngModelChange)="editSystem(i)">
+							<option *ngFor="let harvest of myHarvests">{{harvest.name}}</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6 top-space left">
+					<span class="custom-property">Temperatura del ambiente: {{system.airTemperatureM | number : '1.0-2'}} ºC</span>
+				</div>
+				<div class="col-md-6 top-space left">
+					<span class="custom-property">Humedad relativa del ambiente: {{system.airHumidityM  | number : '1.0-2'}} %</span>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6 top-space left">
+					<span class="custom-property">Humedad relativa de la tierra: {{system.soilHumidityM  | number : '1.0-2'}} %</span>
+				</div>
+				<div class="col-md-6 top-space left">
+					<span class="custom-property">Humedad relativa del sensor de lluvia: {{system.rainM  | number : '1.0-2'}} %</span>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6 top-space left">
+					<span class="custom-property">Intensidad relativa de la luz: {{system.lightM  | number : '1.0-2'}} %</span>
+				</div>
+				<div class="col-md-6 top-space left">
+					<span class="custom-property">pH del agua: {{system.phM  | number : '1.0-2'}}</span>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6 top-space left">
+					<span class="custom-property">Último riego: hace {{system.lastWateringM | number : '1.0-2'}} segundos</span>
+				</div>
+			</div>
+			<!--
+			<div *ngIf="showVisualizationSystemSetting[i]" class="top-space">
+				VIDEO
+			</div>
+			-->
+			<div class="btn-group top-space">
+				<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">OPCIONES</button>
+				<div class="dropdown-menu dropdown-menu-right">
+					<div class="dropdown-item cursor-select" (click)="sendAction(i, 2)">REGAR</div>
+					<div class="dropdown-item cursor-select" (click)="sendAction(i, 1)">NEUTRALIZAR pH</div>
+					<div class="dropdown-divider"></div>
+					<!--
+					<div class="custom-dropdown-item">
+						<input type="checkbox" class="cursor-select" [(ngModel)]="showVisualizationSystemSetting[i]">
+						<span> VISUALIZAR CULTIVO</span>
+					</div>
+					<div class="custom-dropdown-item">
+						<input type="checkbox" class="cursor-select" [(ngModel)]="showFertilizationSystemSetting[i]">
+						<span> NEUTRALIZAR pH</span>
+					</div>
+					-->
+					<div class="custom-dropdown-item">
+						<input type="checkbox" class="cursor-select" [(ngModel)]="showModificationSystemSetting[i]">
+						<span> EDITAR PROPIEDADES</span>
+					</div>
+					<div class="dropdown-divider"></div>
+					<div class="dropdown-item cursor-select" (click)="deleteSystem(i)">ELIMINAR CULTIVO</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

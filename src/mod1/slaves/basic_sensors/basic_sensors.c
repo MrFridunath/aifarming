@@ -53,6 +53,7 @@ static pthread_t task_t;
 static int thread_loop = 0;
 static int adc_samples = 10;
 
+//THREAD MONITORIZACION
 void *monitoring_task(void *args)
 {
 	struct sockaddr_in master;
@@ -175,13 +176,17 @@ void *monitoring_task(void *args)
     return NULL;
 }
 
+//WIFI EVENTS
 static esp_err_t event_handler(void *ctx, system_event_t *event)
 {
     switch(event->event_id) {
+	
+	//INICIO WIFI
     case SYSTEM_EVENT_STA_START:
         esp_wifi_connect();
         break;
 
+	//TENGO IP
     case SYSTEM_EVENT_STA_GOT_IP:
 		strcpy(master_ip, ip4addr_ntoa(&event->event_info.got_ip.ip_info.gw));
 		if (thread_loop == 0)
@@ -192,6 +197,8 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 			}
 		}
 		break;
+
+	// DESCONEXION DE RED LOCAL
     case SYSTEM_EVENT_STA_DISCONNECTED:
         {
 			if (thread_loop == 1)
@@ -209,6 +216,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
+//INICIO WIFI
 void wifi_init()
 {
     s_event_group = xEventGroupCreate();
@@ -230,6 +238,7 @@ void wifi_init()
 	ESP_ERROR_CHECK(esp_wifi_start() );
 }
 
+//MAIN
 void app_main() {
 
 	esp_err_t err = nvs_flash_init();
@@ -276,6 +285,7 @@ void app_main() {
 	cJSON *json_data = NULL;
 	cJSON *json_method = NULL;
 
+	// SERVER API
     while(1)
     {
 		client_fd = accept(server_fd, (struct sockaddr *)&client, &client_length);
@@ -326,6 +336,7 @@ void app_main() {
 			continue;
 		}
 
+		//INICIALIZAR
 		if (strcmp(json_method->valuestring, "get-type") == 0)
 		{
 			data[0] = '\0';

@@ -53,6 +53,7 @@ static pthread_t task_t;
 
 static int thread_loop = 0;
 
+//THREAD MONITORIZACION
 void *monitoring_task(void *args)
 {
 	struct sockaddr_in master;
@@ -69,7 +70,6 @@ void *monitoring_task(void *args)
 	thread_loop = 1;
 	while (thread_loop)
 	{
-		//LEER PH
         water_ph_buffer = "7";
         water_ph = 7.0;
 		
@@ -117,13 +117,16 @@ void *monitoring_task(void *args)
     return NULL;
 }
 
+//WIFI EVENTS
 static esp_err_t event_handler(void *ctx, system_event_t *event)
 {
     switch(event->event_id) {
+	
+	//INICIO WIFI
     case SYSTEM_EVENT_STA_START:
         esp_wifi_connect();
         break;
-
+	//TENGO IP
     case SYSTEM_EVENT_STA_GOT_IP:
 		strcpy(master_ip, ip4addr_ntoa(&event->event_info.got_ip.ip_info.gw));
         if (thread_loop == 0)
@@ -134,7 +137,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 		  }
 		}
         break;
-
+	// DESCONEXION DE RED LOCAL
     case SYSTEM_EVENT_STA_DISCONNECTED:
         {
 			if (thread_loop == 1)
@@ -152,6 +155,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
+//INICIO WIFI
 void wifi_init()
 {
     s_event_group = xEventGroupCreate();
@@ -175,6 +179,7 @@ void wifi_init()
 
 static int pulse_count = 0;
 
+//ISR
 static void IRAM_ATTR gpio_isr_handler(void* arg)
 {
     uint32_t gpio_num = (uint32_t) arg;
@@ -186,6 +191,7 @@ static void IRAM_ATTR gpio_isr_handler(void* arg)
 	}
 }
 
+//MAIN
 void app_main() {
 
 	esp_err_t err = nvs_flash_init();
@@ -252,6 +258,7 @@ void app_main() {
 	cJSON *json_data = NULL;
 	cJSON *json_method = NULL;
 
+	// SERVER API
     while(1)
     {
 		client_fd = accept(server_fd, (struct sockaddr *)&client, &client_length);
@@ -302,6 +309,7 @@ void app_main() {
 			continue;
 		}
 
+		//INICIALIZAR
 		if (strcmp(json_method->valuestring, "get-type") == 0)
 		{
 			data[0] = '\0';
@@ -392,6 +400,8 @@ void app_main() {
 			}
 
 		}
+
+		//HACER ACCIÓN
 		else if (strcmp(json_method->valuestring, "make-action") == 0)
 		{
 			json_method = cJSON_GetObjectItemCaseSensitive(json_data, "code");
@@ -414,7 +424,8 @@ void app_main() {
 			data[strlen(data)] = '\0';
 
 			fprintf(stdout, "RESPONSE: %s\n", data);
-				
+			
+			// RESPONDER OK
 			if (write(client_fd, data, strlen(data) + 1) == -1)
 			{
 				fprintf(stderr, "error: the write call on the client failed\n");
@@ -425,12 +436,58 @@ void app_main() {
 			//NEUTRALIZAR
 			if (json_method->valueint == 1 || json_method->valueint == 2)
 			{
-				
+				while(1)
+				{
+					// FALTA -> LEER PH MEDIANTE PINES ADC CANAL 0 y 1
+					if (water_ph != objective_ph)
+					{
+						int positive_umbral = objective_ph + ph_umbral;
+						int negative_umbral = objective_ph - ph_umbral;
+
+						// REDUCIR PH -> ABRIR ELECTROVÁLVULA DE ÁCIDO
+						if (water_ph > positive_umbral)
+						{
+							// FALTA -> LEER PESO ACIDO PINES ADC 2 y 4
+							// FALTA -> DETERMINAR TIEMPO EN FUNCION DE VOLUMEN DE ACIDO
+
+							int time = 0;
+							// gpio_set_level(16, 1);
+							// sleep(time);
+							// gpio_set_level(16, 0);
+							
+							//REINICIO
+							continue;
+						}
+						// AUMENTAR PH -> ABRIR ELECTROVÁLVULA DE BASE
+						else if (water_ph < negative_umbral)
+						{
+							// FALTA -> LEER PESO BASE PINES ADC 3 y 6
+							// FALTA -> DETERMINAR TIEMPO EN FUNCION DE VOLUMEN DE BASE
+
+							int time = 0;
+							// gpio_set_level(18, 1);
+							// sleep(time);
+							// gpio_set_level(18, 0);
+							
+							//REINICIO
+							continue;
+						}
+						
+						else
+						{
+							break;
+						}
+					}
+					else
+					{
+						break;
+					}
+				}
 			}
 
+			// REGAR
 			if (json_method->valueint == 0 || json_method->valueint == 2)
 			{
-				// REGAR
 				double flow_rate = 0;
 				double flow_millilitres = 0;
 				double millilitres = 0;
@@ -503,6 +560,7 @@ void app_main() {
 
 				fprintf(stdout, "SLAVE DATA: %s\n", data);
 
+				// NOTIFICAR DE RIEGO
 				if (write(master_fd, data, strlen(data) + 1) < 0)
 				{
 					fprintf(stderr, "error: the send call on the master failed\n");
@@ -569,7 +627,8 @@ void app_main() {
 			data[strlen(data)] = '\0';
 
 			fprintf(stdout, "RESPONSE: %s\n", data);
-				
+
+			// RESPONDER OK
 			if (write(client_fd, data, strlen(data) + 1) == -1)
 			{
 				fprintf(stderr, "error: the write call on the client failed\n");

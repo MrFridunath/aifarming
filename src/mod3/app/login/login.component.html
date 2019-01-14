@@ -1,0 +1,92 @@
+<div class="header">
+	<span class="header-title"><i>AI FARMING</i></span>
+</div>
+<div class="container container-centered">
+	<div class="main-container">
+		<div *ngIf="!registration" class="main centered">
+			<div class="title-style">LOGIN</div>
+			<form [formGroup]="loginForm" (ngSubmit)="submitLoginForm()" class="form-container">
+				<div class="input-row">
+					<div class="form-group">
+						<input class="form-control" type="text" id="username" formControlName="username" required>
+						<label class="form-control-placeholder" for="username">Usuario</label>
+					</div>
+					<div class="input-validation" @inputValidation *ngIf="loginForm.controls.username.invalid && (loginForm.controls.username.dirty || loginForm.controls.username.touched)">
+						<span *ngIf="loginForm.controls.username.errors.required">Por favor, introduzca su usuario.</span>
+						<span *ngIf="loginForm.controls.username.errors.pattern">El usuario no puede contener el caracter especial ':'.</span>
+						<span *ngIf="loginForm.controls.username.errors.invalid">El usuario introducido no existe.</span>
+					</div>
+				</div>
+				<div class="last-input-row">
+					<div class="form-group">
+						<input class="form-control" type="password" id="password" formControlName="password" required>
+						<label class="form-control-placeholder" for="password">Contraseña</label>
+					</div>
+					<div class="input-validation" @inputValidation *ngIf="loginForm.controls.password.invalid && (loginForm.controls.password.dirty || loginForm.controls.password.touched)">
+						<span *ngIf="loginForm.controls.password.errors.required">Por favor, introduzca su contraseña.</span>
+						<span *ngIf="loginForm.controls.password.errors.minlength">La contraseña ha de contener al menos 8 caracteres.</span>
+					</div>
+					<div class="input-validation">
+						<span *ngIf="invalidLoginForm">La contraseña introducida no es correcta.</span>
+					</div>
+				</div>
+				<div>
+					<button class="btn btn-primary" type="submit" [disabled]="!loginForm.valid">SEND</button>
+				</div>
+			</form>
+		</div>		
+		<div *ngIf="registration" class="main centered">
+			<div class="title-style">REGISTRATION</div>
+			<form [formGroup]="registerForm" (ngSubmit)="submitRegisterForm()" class="form-container">
+				<div class="input-row">
+					<div class="form-group">
+						<input class="form-control" type="text" id="username" formControlName="username" required>
+						<label class="form-control-placeholder" for="username">Usuario</label>
+					</div>
+					<div class="input-validation" @inputValidation *ngIf="registerForm.controls.username.invalid && (registerForm.controls.username.dirty || registerForm.controls.username.touched)">
+						<span *ngIf="registerForm.controls.username.errors.required">Por favor, introduzca un usuario.</span>
+						<span *ngIf="registerForm.controls.username.errors.pattern">El usuario no puede contener el caracter especial ':'.</span>
+						<span *ngIf="registerForm.controls.username.errors.invalid">El usuario introducido ya existe.</span>
+					</div>
+				</div>
+				<div class="input-row">
+					<div class="form-group">
+						<input class="form-control" type="text" id="email" formControlName="email" required>
+						<label class="form-control-placeholder" for="email">Email</label>
+					</div>
+					<div class="input-validation" @inputValidation *ngIf="registerForm.controls.email.invalid && (registerForm.controls.email.dirty || registerForm.controls.email.touched)">
+						<span *ngIf="registerForm.controls.email.errors.required">Por favor, introduzca un correo electrónico.</span>
+						<span *ngIf="registerForm.controls.email.errors.email">El correo electrónico introducido no es válido.</span>
+					</div>
+				</div>
+				<div class="input-row">
+					<div class="form-group">
+						<input class="form-control" type="password" id="password" formControlName="password" required>
+						<label class="form-control-placeholder" for="password">Contraseña</label>
+					</div>
+					<div class="input-validation" @inputValidation *ngIf="registerForm.controls.password.invalid && (registerForm.controls.password.dirty || registerForm.controls.password.touched)">
+						<span *ngIf="registerForm.controls.password.errors.required">Por favor, introduzca una contraseña.</span>
+						<span *ngIf="registerForm.controls.password.errors.minlength">La contraseña ha de contener al menos 8 caracteres.</span>
+					</div>
+				</div>
+				<div class="last-input-row">
+					<div class="form-group">
+						<input class="form-control" type="password" id="repeat_password" formControlName="repeat_password" required>
+						<label class="form-control-placeholder" for="repeat_password">Confirmar Contraseña</label>
+					</div>
+					<div class="input-validation" @inputValidation *ngIf="registerForm.invalid && (registerForm.controls.repeat_password.dirty || registerForm.controls.repeat_password.touched)">
+						<span *ngIf="registerForm.controls.password.valid && registerForm.controls.repeat_password.invalid && registerForm.controls.repeat_password.errors.required">Por favor, repita la contraseña anterior.</span>
+						<span *ngIf="registerForm.controls.password.valid && registerForm.controls.repeat_password.valid && registerForm.errors?.invalidmatch">Las contraseñas no coinciden.</span>
+					</div>
+				</div>
+				<div>
+					<button class="btn btn-primary" type="submit" [disabled]="!registerForm.valid">SEND</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="change-main">
+		<span *ngIf="!registration" class="change-label" (click)="registration = !registration">No estoy registrado.</span>
+		<span *ngIf="registration" class="change-label" (click)="registration = !registration">Ya estoy registrado.</span>
+	</div>
+</div>

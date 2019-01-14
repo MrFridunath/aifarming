@@ -36,6 +36,7 @@ static EventGroupHandle_t s_event_group;
 
 static const char *TAG = "AI Farming Middleware Access Point";
 
+// WIFI EVENTS
 static esp_err_t event_handler(void *ctx, system_event_t *event)
 {
     switch(event->event_id) {
@@ -55,26 +56,24 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
+//SERVER DHCP
 static void start_dhcp_server()
 {
-  	// initialize the tcp stack
     tcpip_adapter_init();
-    // stop DHCP server
     ESP_ERROR_CHECK(tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_AP));
-    // assign a static IP to the network interface
     tcpip_adapter_ip_info_t info;
     memset(&info, 0, sizeof(info));
     IP4_ADDR(&info.ip, 192, 168, 1, 1);
-    IP4_ADDR(&info.gw, 192, 168, 1, 1);//ESP acts as router, so gw addr will be its own addr
+    IP4_ADDR(&info.gw, 192, 168, 1, 1);
     IP4_ADDR(&info.netmask, 255, 255, 255, 0);
 	
     ESP_ERROR_CHECK(tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_AP, &info));
-    // start the DHCP server   
     ESP_ERROR_CHECK(tcpip_adapter_dhcps_start(TCPIP_ADAPTER_IF_AP));
 
     printf("DHCP server started \n");
 }
 
+//INICIO WIFI
 void wifi_init()
 {
     s_event_group = xEventGroupCreate();
@@ -107,6 +106,7 @@ void wifi_init()
     ESP_LOGI(TAG, "wifi_init_softap finished.SSID:%s password:%s", ESP32_SSID, ESP32_PASSWORD);
 }
 
+//MAIN
 void app_main()
 {
 	esp_err_t err;
@@ -126,6 +126,7 @@ void app_main()
 		strcpy(masters_mac[i], "");
 	}
 
+	// RECUPERAR NVS
 	nvs_handle nvs;
 	err = nvs_open("storage", NVS_READWRITE, &nvs);
 	if (err != ESP_OK) 
@@ -195,6 +196,7 @@ void app_main()
 	wifi_sta_list_t wifi_sta_list;
 	tcpip_adapter_sta_list_t adapter_sta_list;
 
+	//API SERVER
 	while (1)
 	{
 		client_fd = accept(server_fd, (struct sockaddr *)&client, &client_length);
@@ -246,7 +248,7 @@ void app_main()
 			continue;
 		}
 
-		//ADD-SYSTEM
+		//REGISTRAR CULTIVO
 		if (strcmp(json_method->valuestring, "add-system") == 0)
 		{
 			fprintf(stdout, "METHOD: add-system\n");
@@ -474,7 +476,7 @@ void app_main()
 			}
 		}
 
-		//DELETE-SYSTEM
+		//ELIMINAR CULTIVO
 		else if (strcmp(json_method->valuestring, "delete-system") == 0)
 		{
 			fprintf(stdout, "METHOD: delete-system\n");
@@ -544,7 +546,7 @@ void app_main()
 			}
 		}
 		
-		//EDIT SYSTEM
+		//EDITAR PROPIEDADES DE PH DE CULTIVO REGISTRADO
 		else if (strcmp(json_method->valuestring, "edit-system") == 0)
 		{
 			fprintf(stdout, "METHOD: edit-system\n");
@@ -743,7 +745,7 @@ void app_main()
 			}
 		}
 
-		//GET SYSTEM
+		//OBTENER DATOS DE CULTIVO
 		else if (strcmp(json_method->valuestring, "get-system") == 0)
 		{
 			int status = 409;
@@ -1045,7 +1047,7 @@ void app_main()
 			}
 		}
 		
-		//SEND ACTION
+		//ENVIAR ACCION
 		else if (strcmp(json_method->valuestring, "send-action") == 0)
 		{
 			fprintf(stdout, "METHOD: send-action\n");

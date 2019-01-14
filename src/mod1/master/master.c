@@ -31,10 +31,6 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
-//#define WIFI_SSID "iPhone"
-//#define WIFI_PASSWORD "yu7a2vvuw45fca"
-//#define WIFI_SSID "devolo-30d32d583a87"
-//#define WIFI_PASSWORD "LNHIFWKWNBEWPHXF"
 #define WIFI_SSID "AIFarmingMiddleware"
 #define WIFI_PASSWORD "aifarmingmiddleware"
 
@@ -77,6 +73,8 @@ static struct system_properties properties;
 
 static pthread_t task_t;
 static int thread_loop = 0;
+
+//THREAD MONITORIZACION
 void *monitoring_task(void *args)
 {
 	struct sockaddr_in slave_ph_controller;
@@ -93,6 +91,7 @@ void *monitoring_task(void *args)
 	thread_loop = 1;
 	while (thread_loop)
 	{
+		//¿SE REGO HACE POCO?
 		if (properties.last_water != -1)
 		{
 			clock_t end_t = clock();
@@ -127,6 +126,7 @@ void *monitoring_task(void *args)
 				continue;
 			}
 		}
+		// ¿HA LLOVIDO O ESTÄ HUMEDA LA TIERRA?
 		if ((properties.rain_sensor != -1) && (properties.soil_humidity != -1))
 		{
 			if (properties.rain_sensor < 700 && properties.soil_humidity < 800)
@@ -171,6 +171,7 @@ void *monitoring_task(void *args)
 			sleep(10);
 			continue;
 		}
+		//DETERMINAR SI REGAR O NEUTRALIZAR Y REGAR
 		if (properties.water_ph != -1)
 		{
 			if (properties.water_ph != properties.objective_ph)
@@ -215,6 +216,7 @@ void *monitoring_task(void *args)
 
 		fprintf(stdout, "MASTER DATA: %s\n", data);
 
+		//ENVIAR ACCION A MICRO. SEC. PH
 		if ((slave_ph_controller_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		{
 			fprintf(stderr, "error: the slave socket failed\n");
@@ -277,18 +279,23 @@ void *monitoring_task(void *args)
     return NULL;
 }
 
+//WIFI EVENTS
 static esp_err_t event_handler(void *ctx, system_event_t *event)
 {
     switch(event->event_id) {
+		
+	//INICIO WIFI
     case SYSTEM_EVENT_STA_START:
 		printf("Connected to remote access point\n");
         esp_wifi_connect();
         break;
 
+	//TENGO IP
     case SYSTEM_EVENT_STA_GOT_IP:
 		printf("Got ip from remote access point\n");
         break;
 
+	// DESCONEXION DE RED LOCAL
     case SYSTEM_EVENT_STA_DISCONNECTED:
 		printf("Disconnected from remote access point\n");
 
@@ -308,6 +315,8 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 
 		abort();
 		break;
+		
+	// ALGUIEN SE CONECTO A RED LOCAL
     case SYSTEM_EVENT_AP_STACONNECTED:
 		sleep(3);
 	
@@ -485,6 +494,7 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 		free(mac_temp);
         break;
 
+	// ALGUIEN SE DESCONECTO DE RED LOCAL
     case SYSTEM_EVENT_AP_STADISCONNECTED:
 
         printf("Station disconnected from access point. MAC: %02x:%02x:%02x:%02x:%02x:%02x\n", MAC2STR(event->event_info.sta_disconnected.mac));
@@ -529,26 +539,24 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
+// DHCP SERVER
 static void start_dhcp_server()
 {
-  	// initialize the tcp stack
     tcpip_adapter_init();
-    // stop DHCP server
     ESP_ERROR_CHECK(tcpip_adapter_dhcps_stop(TCPIP_ADAPTER_IF_AP));
-    // assign a static IP to the network interface
     tcpip_adapter_ip_info_t info;
     memset(&info, 0, sizeof(info));
     IP4_ADDR(&info.ip, 192, 168, 1, 1);
-    IP4_ADDR(&info.gw, 192, 168, 1, 1);//ESP acts as router, so gw addr will be its own addr
+    IP4_ADDR(&info.gw, 192, 168, 1, 1);
     IP4_ADDR(&info.netmask, 255, 255, 255, 0);
 	
     ESP_ERROR_CHECK(tcpip_adapter_set_ip_info(TCPIP_ADAPTER_IF_AP, &info));
-    // start the DHCP server   
     ESP_ERROR_CHECK(tcpip_adapter_dhcps_start(TCPIP_ADAPTER_IF_AP));
 
     printf("DHCP server started \n");
 }
 
+//INICIO WIFI
 void wifi_init()
 {
     s_event_group = xEventGroupCreate();
@@ -561,7 +569,7 @@ void wifi_init()
     wifi_config_t sta_wifi_config = {
         .sta = {
             .ssid = WIFI_SSID//,
-            //.password = WIFI_PASSWORD
+            //.password = WIFI_PASSWORD -> PARA DESARROLLO WIFI ABIERTA
         }
     };
 
@@ -586,6 +594,7 @@ void wifi_init()
     ESP_LOGI(TAG, "wifi_init_softap finished.SSID:%s password:%s", ESP32_SSID, ESP32_PASSWORD);
 }
 
+//MAIN
 void app_main()
 {
 	err = nvs_flash_init();
@@ -594,6 +603,7 @@ void app_main()
 	}
 	ESP_ERROR_CHECK(nvs_flash_init());
 
+	// RECUPERAR NVS
 	err = nvs_open("storage", NVS_READWRITE, &nvs);
 	if (err != ESP_OK) 
 	{
@@ -762,6 +772,7 @@ void app_main()
 	cJSON *json_slave_data = NULL;
 	cJSON *json_slave_type = NULL;
 
+	// SERVER API
 	while (1)
 	{
 		client_fd = accept(server_fd, (struct sockaddr *)&client, &client_length);
@@ -812,7 +823,7 @@ void app_main()
 			continue;
 		}
 
-		//UPDATE-SYSTEM
+		//ACTUALIZAR DATOS DE CULTIVO
 		if (strcmp(json_method->valuestring, "update-system") == 0)
 		{
 			json_slave_type = cJSON_GetObjectItemCaseSensitive(json_data, "type");
@@ -1020,6 +1031,7 @@ void app_main()
 			}
 		}
 		
+		// VER DATOS DE CULTIVO ALMACENADOS
 		else if (strcmp(json_method->valuestring, "get-system") == 0) 
 		{
 			printf("METHOD: get-system\n");
@@ -1061,6 +1073,7 @@ void app_main()
 			}
 		}
 		
+		// EDITAR PROPIEDADES DE PH
 		else if (strcmp(json_method->valuestring, "edit-system") == 0) 
 		{
 			printf("METHOD: edit-system\n");
@@ -1226,7 +1239,7 @@ void app_main()
 			}
 		}
 
-		//SEND-ACTION
+		//ENVIAR ACCIÓN A MIC. DE PH
 		else if (strcmp(json_method->valuestring, "send-action") == 0)
 		{
 			printf("METHOD: send-action\n");

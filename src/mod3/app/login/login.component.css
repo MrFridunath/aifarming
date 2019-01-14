@@ -1,0 +1,89 @@
+.container-centered {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.centered {
+	text-align: center;
+}
+.header {
+	position: relative;
+	display: flex;
+	align-items: center;
+	height: 64px;
+	z-index: 10;
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,.3);
+	background-color: #23272b;
+}
+.header-title {
+	margin-left: 50px;
+	color: white;
+	font-size: 30px;
+}
+.main-container {
+	display: inline-block;
+	align-self: center;
+	margin-top: 50px;
+	width: 350px;
+	box-shadow: 0 1px 1px rgba(9, 30, 66, 0.13), 0 0 1px 0 rgba(9, 30, 66, 0.25);
+	border-radius: 3px;
+	background-color: white;
+}
+.main {
+	margin: 20px;
+}
+.title-style {
+	color: #6c757d;;
+	font-size: 20px;
+	text-align: left;
+}
+.form-container {
+	margin-top: 34px;
+}
+.input-row {
+	margin-bottom: 35px;
+}
+.last-input-row {
+	margin-bottom: 20px;
+}
+.input-validation {
+	position: relative;
+	margin-top: 6px;
+	text-align: left !important;
+	color: #dc3545;
+	font-size: 13px;
+}
+.change-main {
+	display: block;
+	position: relative;
+	margin-top: 5px;
+	width: 350px;
+}
+.change-label {
+	position: absolute;
+	right: 0px;
+	cursor: pointer;
+	user-select: none;
+	color: #ff8c00;
+}
+.form-group {
+	margin-top: 5px;
+	margin-bottom: unset;
+	position: relative;
+}
+.form-control-placeholder {
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: 0.375rem 0.76rem;
+	transition: all 300ms;
+	color: #6c757d;
+	cursor: text;
+}
+.form-control:focus + .form-control-placeholder, .form-control:valid + .form-control-placeholder {
+	font-size: 14px;
+	transform: translate3d(0, -100%, 0);
+	color: #000000;
+	opacity: 0.75;
+	padding: 0.375rem 0.02rem;
+}

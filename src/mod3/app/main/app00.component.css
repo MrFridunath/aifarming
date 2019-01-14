@@ -1,0 +1,27 @@
+.header {
+	position: relative;
+	display: flex;
+	align-items: center;
+	height: 64px;
+	z-index: 10;
+	box-shadow: 0 2px 5px 0 rgba(0,0,0,.3);
+	background-color: #23272b;
+}
+.header-title {
+	margin-left: 50px;
+	color: white;
+	font-size: 30px;
+}
+.icons {
+	position: absolute;
+	right: 20px;
+}
+.logout-icon {
+	width: 25px;
+	cursor: pointer;
+    transition: all 0.7s;
+}
+
+.logout-icon:hover {
+	transform: scale(1.4);
+}
